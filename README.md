@@ -84,8 +84,8 @@ python haunted_house_2d.py
 ## 👥 Autores
 
 Projeto desenvolvido para a disciplina de Computação Gráfica:
-- *[Insira seu Nome Completo aqui]*
-- *[Insira o Nome do Integrante 2, se houver]*
-- *[Insira o Nome do Integrante 3, se houver]*
+- *Pedro Gabriel Rico Toro*
+- *Amanda Castro*
+- *Erick Alberto*
 
 **Professor Orientador:** Prof. Dr. Valdir Gil Pillat
