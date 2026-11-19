@@ -6,8 +6,7 @@ import random
 import math
 
 # ==============================================================================
-# VARIÁVEIS GLOBAIS
-# Tudo declarado global aqui no topo pra seguir o padrão dos slides da aula
+# VARIAVEIS GLOBAIS
 # ==============================================================================
 global win, view_w, view_h, texto
 global vidas, qtdcolisao, pontos, estado_jogo, qtd_fantasmas, brilho_nivel
@@ -19,31 +18,31 @@ win = 150.0
 view_w, view_h = 700, 700
 texto = "(0,0)"
 
-# Variáveis da partida
+# Variaveis da partida
 vidas = 3
-qtdcolisao = 3        # Variável usada no exemplo de correção do professor
+qtdcolisao = 3       
 pontos = 0
 estado_jogo = 1       # 1 = Jogando, 2 = Pausado, 3 = Game Over, 0 = Sair
-qtd_fantasmas = 3     # Padrão: 3 fantasmas (muda no menu de dificuldade)
+qtd_fantasmas = 3     # Padrao: 3 fantasmas (muda no menu de dificuldade)
 brilho_nivel = 2      # 1 = Escuro (Penumbra), 2 = Normal, 3 = Mais Brilho
 
-# Variáveis do nosso personagem (2D usa X e Y)
+# Variaveis do nosso personagem (2D usa X e Y)
 player_x = 0.0
 player_y = -110.0
 player_step_x = 0.0
 player_step_y = 0.0
-passos_fluidos = 0    # Contador pra dar inércia e deixar o andar fluido
+passos_fluidos = 0    # Contador pra dar inercia e deixar o andar fluido
 player_raio = 8.0
 
-# Posição inicial da chave
+# Posicao inicial da chave
 chave_x = 0.0
 chave_y = 40.0
 
-# Limites das paredes da mansão 2D (pra não deixar sair da janela)
+# Limites das paredes da mansao 2D (pra nao deixar sair da janela)
 LIMITE_MIN_X, LIMITE_MAX_X = -140.0, 140.0
 LIMITE_MIN_Y, LIMITE_MAX_Y = -135.0, 115.0
 
-# Obstáculos internos do mapa 2D (pilares/móveis vistos de cima) pra ter onde se esconder
+# Obstaculos internos do mapa 2D (pilares/moveis vistos de cima) pra ter onde se esconder
 OBSTACULOS_2D = [
     {"xmin": -65.0, "xmax": -25.0, "ymin":  20.0, "ymax":  50.0}, # Bloco Sup Esquerdo
     {"xmin":  25.0, "xmax":  65.0, "ymin":  20.0, "ymax":  50.0}, # Bloco Sup Direito
@@ -52,7 +51,7 @@ OBSTACULOS_2D = [
     {"xmin":  30.0, "xmax":  70.0, "ymin": -80.0, "ymax": -55.0}  # Bloco Inf Direito
 ]
 
-# Pontos de patrulha pros fantasmas não andarem só em linha reta
+# Pontos de patrulha pros fantasmas nao andarem so em linha reta
 WAYPOINTS_2D = [
     (-110.0,  85.0), (0.0,  90.0), (110.0,  85.0),
     (-110.0, -15.0), (110.0, -15.0),
@@ -69,11 +68,11 @@ fantasmas = [
 FANTASMA_RAIO = 9.0
 
 # ==============================================================================
-# FUNÇÕES DE COLISÃO E SORTEIO
+# FUNCOES DE COLISAO E SORTEIO
 # ==============================================================================
 
 def VerificaColisao2D(x, y, raio):
-    """Checa se o personagem ou fantasma bateu em algum bloco do cenário."""
+    """Checa se o personagem ou fantasma bateu em algum bloco do cenario."""
     for obs in OBSTACULOS_2D:
         if (obs["xmin"] - raio) < x < (obs["xmax"] + raio) and \
            (obs["ymin"] - raio) < y < (obs["ymax"] + raio):
@@ -81,7 +80,7 @@ def VerificaColisao2D(x, y, raio):
     return False
 
 def SorteiaChave():
-    """Coloca a chave num ponto aleatório que não fique preso dentro dos blocos."""
+    """Coloca a chave num ponto aleatorio que nao fique preso dentro dos blocos."""
     while True:
         cx = random.uniform(LIMITE_MIN_X + 15.0, LIMITE_MAX_X - 15.0)
         cy = random.uniform(LIMITE_MIN_Y + 15.0, LIMITE_MAX_Y - 15.0)
@@ -89,7 +88,7 @@ def SorteiaChave():
             return cx, cy
 
 def PosicionaPersonagens():
-    """Reseta o player lá embaixo e manda os fantasmas pros cantos."""
+    """Reseta o player la embaixo e manda os fantasmas pros cantos."""
     global player_x, player_y, player_step_x, player_step_y, passos_fluidos, fantasmas
     player_x, player_y = 0.0, -110.0
     player_step_x, player_step_y = 0.0, 0.0
@@ -107,7 +106,7 @@ def PosicionaPersonagens():
 # ==============================================================================
 
 def DesenhaTexto(string):
-    """Função de texto igualzinha à do slide de correção."""
+    """Funcao de texto igualzinha a do slide de correcao."""
     glPushMatrix()
     for char in string:
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
@@ -143,9 +142,9 @@ def Comentarios():
         DesenhaTexto("FIM DE JOGO! Use o Menu para Reiniciar")
 
 def DesenhaMapa2D():
-    """Desenha o chão, as bordas da sala e os móveis/obstáculos usando GL_QUADS."""
+    """Desenha o chao, as bordas da sala e os moveis/obstaculos usando GL_QUADS."""
     global brilho_nivel
-    # Fator que muda o brilho das cores conforme escolhido no menu (0.5 = escuro, 0.85 = médio, 1.25 = claro)
+    # Fator que muda o brilho das cores conforme escolhido no menu (0.5 = escuro, 0.85 = medio, 1.25 = claro)
     fator = [0.5, 0.85, 1.25][brilho_nivel - 1]
 
     # Ladrilhos de fundo da Casa Assombrada
@@ -172,7 +171,7 @@ def DesenhaMapa2D():
     glVertex2f(LIMITE_MIN_X, LIMITE_MAX_Y)
     glEnd()
 
-    # Desenha os móveis/pilares onde não dá pra atravessar
+    # Desenha os moveis/pilares onde nao da pra atravessar
     for obs in OBSTACULOS_2D:
         # Preenchimento de madeira escura
         glColor3f(0.35 * fator, 0.20 * fator, 0.10 * fator)
@@ -182,7 +181,7 @@ def DesenhaMapa2D():
         glVertex2f(obs["xmax"], obs["ymax"])
         glVertex2f(obs["xmin"], obs["ymax"])
         glEnd()
-        # Borda do móvel
+        # Borda do movel
         glColor3f(0.55 * fator, 0.35 * fator, 0.20 * fator)
         glBegin(GL_LINE_LOOP)
         glVertex2f(obs["xmin"], obs["ymin"])
@@ -208,7 +207,7 @@ def DesenhaJogador2D():
     glVertex2f(-6.5,  2.5)
     glEnd()
 
-    # Cabeça redonda feita com GL_POLYGON
+    # Cabeca redonda feita com GL_POLYGON
     glColor3f(1.0 * fator, 0.85 * fator, 0.7 * fator)
     glBegin(GL_POLYGON)
     for i in range(14):
@@ -216,7 +215,7 @@ def DesenhaJogador2D():
         glVertex2f(math.cos(ang) * 5.0, 3.5 + math.sin(ang) * 5.0)
     glEnd()
 
-    # Chapéu de caçador (GL_TRIANGLES)
+    # Chapeu de cacador (GL_TRIANGLES)
     glColor3f(0.2 * fator, 0.3 * fator, 0.6 * fator)
     glBegin(GL_TRIANGLES)
     glVertex2f(-6.0, 6.5)
@@ -233,7 +232,7 @@ def DesenhaChave2D():
     glTranslatef(chave_x, chave_y, 0.0)
     glColor3f(1.0, 0.85, 0.0)
 
-    # Argola da chave (Losango / Polígono)
+    # Argola da chave (Losango / Poligono)
     glBegin(GL_POLYGON)
     glVertex2f(-7.0,  0.0)
     glVertex2f(-3.5,  3.5)
@@ -250,7 +249,7 @@ def DesenhaChave2D():
     glPopMatrix()
 
 def DesenhaFantasmas2D():
-    """Desenha os fantasmas activos. Os olhos ficam amarelos quando estão dando bote."""
+    """Desenha os fantasmas activos. Os olhos ficam amarelos quando estao dando bote."""
     global fantasmas, qtd_fantasmas, brilho_nivel
     fator = min([0.65, 1.0, 1.2][brilho_nivel - 1], 1.0)
 
@@ -290,7 +289,7 @@ def DesenhaFantasmas2D():
         glPopMatrix()
 
 # ==============================================================================
-# FUNÇÃO DESENHA PRINCIPAL (Padrão Slide 93)
+# FUNCAO DESENHA PRINCIPAL (Padrao Slide 93)
 # ==============================================================================
 
 def Desenha():
@@ -323,7 +322,7 @@ def Timer(value):
     global chave_x, chave_y, fantasmas, qtd_fantasmas, pontos, vidas, qtdcolisao, estado_jogo
 
     if estado_jogo == 1:
-        # 1. Movimento fluido do jogador com deslize (inércia) e colisão nos eixos X e Y separados
+        # 1. Movimento fluido do jogador com deslize (inercia) e colisao nos eixos X e Y separados
         if passos_fluidos > 0:
             passos_fluidos -= 1
             nx = player_x + player_step_x
@@ -338,7 +337,7 @@ def Timer(value):
             player_step_x *= 0.85
             player_step_y *= 0.85
 
-        # 2. IA dos fantasmas (Rondas Curvas + Bote Temporário)
+        # 2. IA dos fantasmas (Rondas Curvas + Bote Temporario)
         atacando_agora = sum(1 for i in range(qtd_fantasmas) if fantasmas[i]["estado"] == "ataque")
 
         for i in range(qtd_fantasmas):
@@ -404,7 +403,7 @@ def Timer(value):
             livre_x = (LIMITE_MIN_X + FANTASMA_RAIO <= fx_novo <= LIMITE_MAX_X - FANTASMA_RAIO) and not VerificaColisao2D(fx_novo, f["y"], FANTASMA_RAIO)
             livre_y = (LIMITE_MIN_Y + FANTASMA_RAIO <= fy_novo <= LIMITE_MAX_Y - FANTASMA_RAIO) and not VerificaColisao2D(f["x"], fy_novo, FANTASMA_RAIO)
 
-            # Desvia dos móveis deslizando pela borda
+            # Desvia dos moveis deslizando pela borda
             if livre_x and livre_y:
                 f["x"], f["y"] = fx_novo, fy_novo
             elif livre_x:
@@ -415,12 +414,12 @@ def Timer(value):
                 f["theta"] += 1.5
                 f["wp"] = (f["wp"] + 1) % len(WAYPOINTS_2D)
 
-        # 3. Colisão Jogador <-> Chave
+        # 3. Colisao Jogador <-> Chave
         if math.hypot(player_x - chave_x, player_y - chave_y) < 15.0:
             pontos += 10
             chave_x, chave_y = SorteiaChave()
 
-        # 4. Colisão Jogador <-> Fantasmas
+        # 4. Colisao Jogador <-> Fantasmas
         for i in range(qtd_fantasmas):
             f = fantasmas[i]
             if math.hypot(player_x - f["x"], player_y - f["y"]) < (player_raio + FANTASMA_RAIO):
@@ -435,7 +434,7 @@ def Timer(value):
     glutTimerFunc(33, Timer, 1)
 
 # ==============================================================================
-# EVENTOS DE TECLADO, MOUSE E MENU (Padrão Intr_OpenGL(Parte2_Menus1).pdf)
+# EVENTOS DE TECLADO, MOUSE E MENU (Padrao Intr_OpenGL(Parte2_Menus1).pdf)
 # ==============================================================================
 
 def GerenciaTeclado(key, x, y):
@@ -466,7 +465,7 @@ def GerenciaTeclado(key, x, y):
     glutPostRedisplay()
 
 def TeclasEspeciais(key, x, y):
-    """Também permite andar usando as setinhas do teclado."""
+    """Tambem permite andar usando as setinhas do teclado."""
     global player_step_x, player_step_y, passos_fluidos
     impulso = 4.8
     if key == GLUT_KEY_UP:
@@ -500,7 +499,7 @@ def GerenciaMouse(button, state, x, y):
     glutPostRedisplay()
 
 def MenuDificuldade(op):
-    """Seleciona o número de fantasmas pelo menu."""
+    """Seleciona o numero de fantasmas pelo menu."""
     global qtd_fantasmas, vidas, qtdcolisao, pontos, estado_jogo, chave_x, chave_y
     if op == 0:   qtd_fantasmas = 2
     elif op == 1: qtd_fantasmas = 3
@@ -555,7 +554,7 @@ def CriaMenu():
     return 0
 
 # ==============================================================================
-# INICIALIZAÇÃO E CONFIGURAÇÃO DE JANELA 2D (Slide 94)
+# INICIALIZACAO E CONFIGURACAO DE JANELA 2D (Slide 94)
 # ==============================================================================
 
 def AlteraTamanhoJanela(w, h):

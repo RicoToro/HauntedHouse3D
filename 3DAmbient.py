@@ -4,33 +4,32 @@ from OpenGL.GLUT import *
 import sys
 import os
 
-# VARIÁVEIS GLOBAIS
+# VARIAVEIS GLOBAIS
 # Declaradas no escopo global pra manter o estado entre as callbacks do GLUT
 global angle, fAspect, view_w, view_h, texto
 global anguloX, anguloY, camX, camY, camZ, cam_modo
 global modo_luz, brilho_nivel
 
-# Parâmetros da câmera e projeção perspectiva
-angle = 45.0          # Campo de visão (FOV) no eixo Y -> usamos pra fazer o Zoom
-fAspect = 1.0         # Proporção largura/altura da tela (evita achatar o desenho)
+# Parametros da camera e projecao perspectiva
+angle = 45.0          # Campo de visao (FOV) no eixo Y -> usamos pra fazer o Zoom
+fAspect = 1.0         # Proporcao largura/altura da tela (evita achatar o desenho)
 view_w, view_h = 800, 600
 
-# Ângulos de rotação da cena pelas setas do teclado
-# Começa em 15 graus pra dar uma visão isométrica/diagonal legal do quarto
+# Angulos de rotacao da cena pelas setas do teclado
+# Comeca em 15 graus pra dar uma visao isometrica/diagonal legal do quarto
 anguloX = 15.0        
 anguloY = 15.0        
 
-# Posição inicial da câmera no gluLookAt
+# Posicao inicial da camera no gluLookAt
 cam_modo = 1
 camX, camY, camZ = 0.0, 6.5, 16.0
 texto = "(0,0)"       # Guarda a coordenada (x, y) do mouse pra mostrar no topo
 
-# Estados da iluminação (1 a 5) e intensidade do brilho (1 a 3)
+# Estados da iluminacao (1 a 5) e intensidade do brilho (1 a 3)
 modo_luz = 1          
 brilho_nivel = 2      
 
 # TEXTO 2D NA TELA (HUD)
-# Baseado na correção de exibição de caracteres do material de aula
 
 def DesenhaTexto(string):
     """Percorre a string caractere por caractere desenhando o bitmap na tela."""
@@ -47,16 +46,16 @@ def DesenhaTextoPequeno(string):
 
 def Comentarios():
     """
-    Cria uma camada 2D temporária por cima do 3D pra escrever o menu de ajuda
+    Cria uma camada 2D temporaria por cima do 3D pra escrever o menu de ajuda
     e as coordenadas do mouse sem que o texto gire junto com o quarto.
     """
     global modo_luz, brilho_nivel, cam_modo, texto
 
-    # Desliga a iluminação e o Z-buffer pro texto não ficar escuro nem sumir atrás das paredes
+    # Desliga a iluminacao e o Z-buffer pro texto nao ficar escuro nem sumir atras das paredes
     glDisable(GL_LIGHTING)
     glDisable(GL_DEPTH_TEST)
 
-    # Salva a matriz de projeção 3D e joga uma ortográfica 2D (800x600) só pro texto
+    # Salva a matriz de projecao 3D e joga uma ortografica 2D (800x600) so pro texto
     glMatrixMode(GL_PROJECTION)
     glPushMatrix()
     glLoadIdentity()
@@ -69,7 +68,7 @@ def Comentarios():
     nomes_luz = {1: "Normal", 2: "Fraca (Penumbra)", 3: "Vermelha", 4: "Verde", 5: "Azul"}
     nomes_brilho = {1: "Baixo", 2: "Normal", 3: "Alto"}
 
-    # Cabeçalho principal
+    # Cabecalho principal
     glColor3f(1.0, 1.0, 1.0)
     glRasterPos2f(20.0, 570.0)
     titulo = "Ambiente 3D: Quarto  |  Luz: {0:s}  |  Brilho: {1:s}  |  Camera: {2:d}".format(
@@ -77,12 +76,12 @@ def Comentarios():
     )
     DesenhaTexto(titulo)
 
-    # Linha de instruções e posição atual do cursor do mouse
+    # Linha de instrucoes e posicao atual do cursor do mouse
     glColor3f(0.8, 0.9, 1.0)
     glRasterPos2f(20.0, 545.0)
     DesenhaTextoPequeno("Setas: Girar (Com Limite) | Clique Esq ou Z/X: Zoom | 1-5: Luz | C: Mudar Camera | Botao Dir: MENU | Mouse: " + texto)
 
-    # Desempilha as matrizes pra devolver a projeção 3D intacta
+    # Desempilha as matrizes pra devolver a projecao 3D intacta
     glPopMatrix()
     glMatrixMode(GL_PROJECTION)
     glPopMatrix()
@@ -92,12 +91,12 @@ def Comentarios():
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_LIGHTING)
 
-# ILUMINAÇÃO E MATERIAIS (Gouraud / GL_LIGHT0)
+# ILUMINACAO E MATERIAIS (Gouraud / GL_LIGHT0)
 
 def iluminacao():
     """
     Define os vetores RGBA de luz ambiente, difusa e especular.
-    A posição da luz foi colocada perto da cúpula do abajur do quarto.
+    A posicao da luz foi colocada perto da cupula do abajur do quarto.
     """
     global modo_luz, brilho_nivel
 
@@ -123,22 +122,22 @@ def iluminacao():
         luzDifusa   = [0.15, 0.30, 1.0 * mult_luz, 1.0]
 
     luzEspecular   = [mult_espec, mult_espec, mult_espec, 1.0]
-    posicaoLuz     = [-2.2, 3.8, -3.5, 1.0] # Coordenada da lâmpada do abajur
+    posicaoLuz     = [-2.2, 3.8, -3.5, 1.0] # Coordenada da lampada do abajur
 
-    # Capacidade de brilho dos móveis (concentração do reflexo especular)
+    # Capacidade de brilho dos moveis (concentracao do reflexo especular)
     especularidade = [mult_espec, mult_espec, mult_espec, 1.0]
     especMaterial  = [20, 50, 100][brilho_nivel - 1]
 
     glClearColor(0.05, 0.05, 0.08, 1.0)
     
-    # Habilita o modelo de Gouraud (interpola as cores suavemente entre os vértices)
+    # Habilita o modelo de Gouraud (interpola as cores suavemente entre os vertices)
     glShadeModel(GL_SMOOTH)
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, especularidade)
     glMateriali(GL_FRONT, GL_SHININESS, especMaterial)
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzAmbiente)
 
-    # Passa os parâmetros pra fonte de luz 0
+    # Passa os parametros pra fonte de luz 0
     glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
     glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
     glLightfv(GL_LIGHT0, GL_SPECULAR, luzEspecular)
@@ -148,15 +147,15 @@ def iluminacao():
     glEnable(GL_COLOR_MATERIAL)
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
-    glEnable(GL_DEPTH_TEST) # Z-Buffer pra esconder faces que estão atrás de outros móveis
+    glEnable(GL_DEPTH_TEST) # Z-Buffer pra esconder faces que estao atras de outros moveis
     glEnable(GL_NORMALIZE)  # Recalcula as normais depois de usar glScalef nos cubos
 
 # MODELAGEM DOS OBJETOS DO QUARTO
-# Todos os móveis usam glPushMatrix() e glPopMatrix() pra que a translação e 
-# escala de uma peça não acumule e deforme o próximo móvel da lista.
+# Todos os moveis usam glPushMatrix() e glPopMatrix() pra que a translacao e 
+# escala de uma peca nao acumule e deforme o proximo movel da lista.
 
 def chao_e_paredes():
-    """Monta a estrutura física do quarto (piso, tapete e paredes)."""
+    """Monta a estrutura fisica do quarto (piso, tapete e paredes)."""
     # Piso de madeira (cubo achatado em Y e esticado em X e Z)
     glColor3f(0.42, 0.26, 0.14)
     glPushMatrix()
@@ -217,7 +216,7 @@ def cama():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # 4 pés da cama gerados com laço for nas coordenadas das pontas
+    # 4 pes da cama gerados com laco for nas coordenadas das pontas
     for px in [-1.4, 1.4]:
         for pz in [-2.4, 2.4]:
             glPushMatrix()
@@ -226,7 +225,7 @@ def cama():
             glutSolidCube(1.0)
             glPopMatrix()
 
-    # Colchão branco
+    # Colchao branco
     glColor3f(0.92, 0.92, 0.95)
     glPushMatrix()
     glTranslatef(0.0, 0.75, 0.1)
@@ -234,7 +233,7 @@ def cama():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Cobertor vermelho por cima do colchão
+    # Cobertor vermelho por cima do colchao
     glColor3f(0.65, 0.15, 0.18)
     glPushMatrix()
     glTranslatef(0.0, 0.78, 0.85)
@@ -253,7 +252,7 @@ def cama():
     glPopMatrix()
 
 def abajur():
-    """Objeto 2: Criado-mudo com o abajur (usa glutSolidCone na cúpula)."""
+    """Objeto 2: Criado-mudo com o abajur (usa glutSolidCone na cupula)."""
     glPushMatrix()
     glTranslatef(-1.8, 0.0, -4.8)
 
@@ -265,7 +264,7 @@ def abajur():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Base metálica e haste do abajur
+    # Base metalica e haste do abajur
     glColor3f(0.25, 0.25, 0.28)
     glPushMatrix()
     glTranslatef(0.0, 1.15, 0.0)
@@ -279,7 +278,7 @@ def abajur():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Cúpula do abajur: rotacionamos -90 graus em X porque o cone padrão do GLUT aponta pra Z
+    # Cupula do abajur: rotacionamos -90 graus em X porque o cone padrao do GLUT aponta pra Z
     glColor3f(1.0, 0.88, 0.35)
     glPushMatrix()
     glTranslatef(0.0, 1.9, 0.0)
@@ -290,7 +289,7 @@ def abajur():
     glPopMatrix()
 
 def mesa():
-    """Objeto 3: Mesa/Bancada que serve de suporte para a Televisão."""
+    """Objeto 3: Mesa/Bancada que serve de suporte para a Televisao."""
     glPushMatrix()
     glTranslatef(1.8, 0.0, -4.4)
 
@@ -321,7 +320,7 @@ def mesa():
     glPopMatrix()
 
 def televisao():
-    """Objeto 4: Televisão apoiada exatamente em cima do tampo da mesa (Y = 1.5)."""
+    """Objeto 4: Televisao apoiada exatamente em cima do tampo da mesa (Y = 1.5)."""
     glPushMatrix()
     glTranslatef(1.8, 1.5, -4.4)
 
@@ -333,14 +332,14 @@ def televisao():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Pescoço do suporte
+    # Pescoco do suporte
     glPushMatrix()
     glTranslatef(0.0, 0.25, -0.05)
     glScalef(0.25, 0.4, 0.15)
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Carcaça preta da tela
+    # Carcaca preta da tela
     glColor3f(0.08, 0.08, 0.10)
     glPushMatrix()
     glTranslatef(0.0, 1.15, 0.0)
@@ -348,7 +347,7 @@ def televisao():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Display azulado ligeiramente deslocado pra frente (Z = 0.09) pra não dar Z-fighting
+    # Display azulado ligeiramente deslocado pra frente (Z = 0.09) pra nao dar Z-fighting
     glColor3f(0.18, 0.45, 0.75)
     glPushMatrix()
     glTranslatef(0.0, 1.15, 0.09)
@@ -356,7 +355,7 @@ def televisao():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Botão power (esfera vermelha no cantinho inferior direito da moldura)
+    # Botao power (esfera vermelha no cantinho inferior direito da moldura)
     glColor3f(1.0, 0.1, 0.1)
     glPushMatrix()
     glTranslatef(1.25, 0.42, 0.09)
@@ -379,7 +378,7 @@ def estante():
     glutSolidCube(1.0)
     glPopMatrix()
 
-    # Tábuas laterais
+    # Tabuas laterais
     for lx in [-1.75, 1.75]:
         glPushMatrix()
         glTranslatef(lx, 2.2, 0.0)
@@ -395,7 +394,7 @@ def estante():
         glutSolidCube(1.0)
         glPopMatrix()
 
-    # Livros coloridos distribuídos em duas prateleiras
+    # Livros coloridos distribuidos em duas prateleiras
     cores_livros = [
         (0.85, 0.15, 0.15), (0.15, 0.65, 0.25), (0.15, 0.30, 0.85),
         (0.85, 0.75, 0.15), (0.65, 0.15, 0.65), (0.15, 0.75, 0.75)
@@ -424,7 +423,7 @@ def armario():
     glTranslatef(5.6, 0.0, 0.5)
     glRotatef(-90.0, 0.0, 1.0, 0.0) # Gira -90 graus pra ficar de frente pro quarto
 
-    # Caixote principal do armário
+    # Caixote principal do armario
     glColor3f(0.38, 0.22, 0.10)
     glPushMatrix()
     glTranslatef(0.0, 2.4, 0.0)
@@ -441,7 +440,7 @@ def armario():
         glutSolidCube(1.0)
         glPopMatrix()
 
-    # Maçanetas/puxadores redondos (glutSolidSphere)
+    # Macanetas/puxadores redondos (glutSolidSphere)
     glColor3f(0.9, 0.8, 0.2)
     for px in [-0.2, 0.2]:
         glPushMatrix()
@@ -451,13 +450,12 @@ def armario():
 
     glPopMatrix()
 
-# PROJEÇÃO PERSPECTIVA E RENDERIZAÇÃO DA CENA
+# PROJECAO PERSPECTIVA E RENDERIZACAO DA CENA
 
 def EspecificaParametrosVisualizacao():
     """
-    Define a lente da câmera (gluPerspective) e a posição do observador (gluLookAt).
-    Seguindo os slides de correção, não colocamos glOrtho aqui junto com gluPerspective
-    para que a rotação e o zoom funcionem perfeitamente.
+    Define a lente da camera (gluPerspective) e a posicao do observador (gluLookAt).
+
     """
     global angle, fAspect, camX, camY, camZ
     glMatrixMode(GL_PROJECTION)
@@ -466,7 +464,7 @@ def EspecificaParametrosVisualizacao():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    # Câmera em (camX, camY, camZ) olhando para o meio do quarto (0.0, 2.0, -1.0)
+    # Camera em (camX, camY, camZ) olhando para o meio do quarto (0.0, 2.0, -1.0)
     gluLookAt(camX, camY, camZ, 0.0, 2.0, -1.0, 0.0, 1.0, 0.0)
 
 def Desenha():
@@ -478,7 +476,7 @@ def Desenha():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glPushMatrix()
-    # Aplica a rotação controlada pelo usuário nas setas do teclado (Slide 19)
+    # Aplica a rotacao controlada pelo usuario nas setas do teclado (Slide 19)
     glRotated(anguloY, 1.0, 0.0, 0.0)
     glRotated(anguloX, 0.0, 1.0, 0.0)
 
@@ -496,27 +494,27 @@ def Desenha():
     Comentarios()
     glutSwapBuffers()
 
-# INTERAÇÃO: TECLADO, MOUSE E LIMITES DE ÂNGULO (CLAMPING)
+# INTERACAO: TECLADO, MOUSE E LIMITES DE ANGULO (CLAMPING)
 
 def AlternarCamera(modo):
-    """Permite olhar o quarto de 4 ângulos diferentes pré-configurados."""
+    """Permite olhar o quarto de 4 angulos diferentes pre-configurados."""
     global cam_modo, camX, camY, camZ, anguloX, anguloY
     cam_modo = modo
-    if cam_modo == 1:   # Visão Frontal Padrão
+    if cam_modo == 1:   # Visao Frontal Padrao
         camX, camY, camZ = 0.0, 6.5, 16.0
         anguloX, anguloY = 15.0, 15.0
-    elif cam_modo == 2: # Visão Superior (Planta baixa do quarto)
+    elif cam_modo == 2: # Visao Superior (Planta baixa do quarto)
         camX, camY, camZ = 0.0, 18.0, 6.0
         anguloX, anguloY = 0.0, 30.0
-    elif cam_modo == 3: # Visão do Canto Esquerdo (Foco na TV e Armário)
+    elif cam_modo == 3: # Visao do Canto Esquerdo (Foco na TV e Armario)
         camX, camY, camZ = -9.0, 6.5, 13.0
         anguloX, anguloY = -15.0, 12.0
-    elif cam_modo == 4: # Visão do Canto Direito (Foco na Cama e Estante)
+    elif cam_modo == 4: # Visao do Canto Direito (Foco na Cama e Estante)
         camX, camY, camZ = 9.0, 6.5, 13.0
         anguloX, anguloY = 15.0, 12.0
 
 def GerenciaTeclado(key, x, y):
-    """Atalhos no teclado para iluminação (1-5), zoom (Z/X), câmera (C) e brilho (B)."""
+    """Atalhos no teclado para iluminacao (1-5), zoom (Z/X), camera (C) e brilho (B)."""
     global modo_luz, brilho_nivel, angle, cam_modo
 
     if key in [b'1', b'2', b'3', b'4', b'5']:
@@ -540,12 +538,12 @@ def GerenciaTeclado(key, x, y):
 
 def TeclasEspeciais(key, x, y):
     """
-    Rotaciona o quarto pelas setas no sentido natural de câmera, com travas (clamping)
-    para impedir que a visão passe para baixo do chão da casa ou vire para trás das paredes.
+    Rotaciona o quarto pelas setas no sentido natural de camera, com travas (clamping)
+    para impedir que a visao passe para baixo do chao da casa ou vire para tras das paredes.
     """
     global anguloX, anguloY
     
-    # Seta pra CIMA sobe a visão (olha mais de cima); Seta pra BAIXO desce até a altura do piso
+    # Seta pra CIMA sobe a visao (olha mais de cima); Seta pra BAIXO desce ate a altura do piso
     if key == GLUT_KEY_UP:
         if anguloY < 65.0:
             anguloY += 3.0
@@ -553,7 +551,7 @@ def TeclasEspeciais(key, x, y):
         if anguloY > -5.0:
             anguloY -= 3.0
             
-    # Seta pra ESQUERDA e DIREITA giram a visão lateralmente entre -45 e +45 graus
+    # Seta pra ESQUERDA e DIREITA giram a visao lateralmente entre -45 e +45 graus
     elif key == GLUT_KEY_LEFT:
         if anguloX < 45.0:
             anguloX += 3.0
@@ -575,7 +573,7 @@ def MoveMouse(x, y):
     glutPostRedisplay()
 
 def GerenciaMouse(button, state, x, y):
-    """Clique esquerdo aproxima (Zoom In), botão do meio afasta e botão direito abre o Menu."""
+    """Clique esquerdo aproxima (Zoom In), botao do meio afasta e botao direito abre o Menu."""
     global angle
     if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
         if angle >= 15.0:
@@ -588,7 +586,7 @@ def GerenciaMouse(button, state, x, y):
     EspecificaParametrosVisualizacao()
     glutPostRedisplay()
 
-# MENU POP-UP DO GLUT (Botão Direito)
+# MENU POP-UP DO GLUT (Botao Direito)
 
 def MenuIluminacao(op):
     global modo_luz
@@ -654,10 +652,10 @@ def CriaMenu():
     glutAttachMenu(GLUT_RIGHT_BUTTON)
     return 0
 
-# CONFIGURAÇÃO DE JANELA E FUNÇÃO PRINCIPAL
+# CONFIGURACAO DE JANELA E FUNCAO PRINCIPAL
 
 def AlteraTamanhoJanela(w, h):
-    """Recalcula a razão de aspecto (fAspect = w/h) sempre que a janela é redimensionada."""
+    """Recalcula a razao de aspecto (fAspect = w/h) sempre que a janela e redimensionada."""
     global view_w, view_h, fAspect
     if h == 0:
         h = 1
@@ -675,7 +673,7 @@ def Inicializa():
 
 def main():
     glutInit(sys.argv)
-    # GLUT_DOUBLE ativa o double-buffering (evita cintilação) e GLUT_DEPTH ativa o Z-buffer
+    # GLUT_DOUBLE ativa o double-buffering (evita cintilacao) e GLUT_DEPTH ativa o Z-buffer
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
     glutInitWindowSize(800, 600)
     glutInitWindowPosition(50, 50)
