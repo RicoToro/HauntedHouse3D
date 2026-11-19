@@ -2,11 +2,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import sys
+import os
 
-# 
 # VARIÁVEIS GLOBAIS
 # Declaradas no escopo global pra manter o estado entre as callbacks do GLUT
-# 
 global angle, fAspect, view_w, view_h, texto
 global anguloX, anguloY, camX, camY, camZ, cam_modo
 global modo_luz, brilho_nivel
@@ -30,10 +29,8 @@ texto = "(0,0)"       # Guarda a coordenada (x, y) do mouse pra mostrar no topo
 modo_luz = 1          
 brilho_nivel = 2      
 
-# 
 # TEXTO 2D NA TELA (HUD)
 # Baseado na correção de exibição de caracteres do material de aula
-# 
 
 def DesenhaTexto(string):
     """Percorre a string caractere por caractere desenhando o bitmap na tela."""
@@ -95,9 +92,7 @@ def Comentarios():
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_LIGHTING)
 
-# 
 # ILUMINAÇÃO E MATERIAIS (Gouraud / GL_LIGHT0)
-# 
 
 def iluminacao():
     """
@@ -156,14 +151,12 @@ def iluminacao():
     glEnable(GL_DEPTH_TEST) # Z-Buffer pra esconder faces que estão atrás de outros móveis
     glEnable(GL_NORMALIZE)  # Recalcula as normais depois de usar glScalef nos cubos
 
-# 
 # MODELAGEM DOS OBJETOS DO QUARTO
 # Todos os móveis usam glPushMatrix() e glPopMatrix() pra que a translação e 
 # escala de uma peça não acumule e deforme o próximo móvel da lista.
-# 
 
 def chao_e_paredes():
-    """Monta a estrutura física do quarto (piso, tapete e paredes em L)."""
+    """Monta a estrutura física do quarto (piso, tapete e paredes)."""
     # Piso de madeira (cubo achatado em Y e esticado em X e Z)
     glColor3f(0.42, 0.26, 0.14)
     glPushMatrix()
@@ -458,9 +451,7 @@ def armario():
 
     glPopMatrix()
 
-# 
 # PROJEÇÃO PERSPECTIVA E RENDERIZAÇÃO DA CENA
-# 
 
 def EspecificaParametrosVisualizacao():
     """
@@ -505,9 +496,7 @@ def Desenha():
     Comentarios()
     glutSwapBuffers()
 
-# 
 # INTERAÇÃO: TECLADO, MOUSE E LIMITES DE ÂNGULO (CLAMPING)
-#
 
 def AlternarCamera(modo):
     """Permite olhar o quarto de 4 ângulos diferentes pré-configurados."""
@@ -543,36 +532,34 @@ def GerenciaTeclado(key, x, y):
     elif key == b'r' or key == b'R':
         angle = 45.0
         AlternarCamera(1)
-    elif ord(key) == 27: # ESC fecha a janela
-        sys.exit(0)
+    elif ord(key) == 27: # ESC encerra o programa na hora
+        os._exit(0)
 
     EspecificaParametrosVisualizacao()
     glutPostRedisplay()
 
 def TeclasEspeciais(key, x, y):
     """
-    Rotaciona o quarto pelas setas do teclado, mas aplica travas (clamping)
-    para impedir que a câmera passe para baixo do chão da casa ou vire para
-    trás das paredes.
+    Rotaciona o quarto pelas setas no sentido natural de câmera, com travas (clamping)
+    para impedir que a visão passe para baixo do chão da casa ou vire para trás das paredes.
     """
     global anguloX, anguloY
     
-    # Seta pra cima e pra baixo controlam a inclinação vertical (anguloY)
-    # Trava mínima em -5.0 (não deixa olhar por baixo do piso) e máxima em 65.0 (visão de topo)
+    # Seta pra CIMA sobe a visão (olha mais de cima); Seta pra BAIXO desce até a altura do piso
     if key == GLUT_KEY_UP:
-        if anguloY > -5.0:
-            anguloY -= 3.0
-    elif key == GLUT_KEY_DOWN:
         if anguloY < 65.0:
             anguloY += 3.0
+    elif key == GLUT_KEY_DOWN:
+        if anguloY > -5.0:
+            anguloY -= 3.0
             
-    # Seta esquerda e direita giram o quarto lateralmente entre -45 e +45 graus
+    # Seta pra ESQUERDA e DIREITA giram a visão lateralmente entre -45 e +45 graus
     elif key == GLUT_KEY_LEFT:
-        if anguloX > -45.0:
-            anguloX -= 3.0
-    elif key == GLUT_KEY_RIGHT:
         if anguloX < 45.0:
             anguloX += 3.0
+    elif key == GLUT_KEY_RIGHT:
+        if anguloX > -45.0:
+            anguloX -= 3.0
 
     EspecificaParametrosVisualizacao()
     glutPostRedisplay()
@@ -601,9 +588,7 @@ def GerenciaMouse(button, state, x, y):
     EspecificaParametrosVisualizacao()
     glutPostRedisplay()
 
-# 
 # MENU POP-UP DO GLUT (Botão Direito)
-# 
 
 def MenuIluminacao(op):
     global modo_luz
@@ -633,7 +618,8 @@ def MenuPrincipal(op):
     elif op == 2:
         if angle <= 90.0: angle += 10.0
     elif op == 3:
-        sys.exit(0)
+        # os._exit(0) fecha a janela GLUT imediatamente sem ser bloqueado pelo glutMainLoop
+        os._exit(0)
     EspecificaParametrosVisualizacao()
     glutPostRedisplay()
     return 0
@@ -668,9 +654,7 @@ def CriaMenu():
     glutAttachMenu(GLUT_RIGHT_BUTTON)
     return 0
 
-# 
 # CONFIGURAÇÃO DE JANELA E FUNÇÃO PRINCIPAL
-# 
 
 def AlteraTamanhoJanela(w, h):
     """Recalcula a razão de aspecto (fAspect = w/h) sempre que a janela é redimensionada."""
